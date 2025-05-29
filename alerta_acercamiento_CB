@@ -1,0 +1,251 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Mon May 26 13:44:35 2025
+
+@author: Alejandro Hernández Flores
+"""
+
+
+import subprocess
+import shutil
+import os
+import sys
+from telegram import Bot
+from telegram.error import TelegramError
+import asyncio
+import requests
+from bs4 import BeautifulSoup
+
+print("SCRIPT INICIADO: Cargando configuraciones y funciones...")
+
+# --- Configuración de Telegram ---
+TELEGRAM_TOKEN = "7581213900:AAH7xAKsnw4MhRdEXbhjwmuQpTsVRffdEFg"
+TELEGRAM_CHAT_ID = "-1002327539696"
+TELEGRAM_MAX_LENGTH = 4096
+print(f"DEBUG_CONFIG: Telegram TOKEN configurado. Chat ID: {TELEGRAM_CHAT_ID}")
+
+# --- Configuración de Octave y directorios ---
+directorio_propagador_octave = "C:\\Users\\Alejandro\\Documents\\Programas octave\\propagador dinamica orbital v3.3"
+script_octave_principal = "run_alerta_acercamiento.m"
+ruta_ejecutable_octave = "C:\\Octave\\Octave-4.2.2\\bin\\octave-cli.exe"
+directorio_tle_python = "C:\\Users\\Alejandro\\Documents\\programas_python\\herramientas dinamica orbital\\seguimiento_acercamientos"
+
+# Definición del nombre exacto del reporte generado por Octave (sin el ID del satélite)
+nombre_archivo_reporte_octave_generado = "reporte_acercamientos.txt" 
+
+# La RUTA BASE donde Python ESPERA ENCONTRAR los reportes generados por Octave
+ruta_base_reportes_octave_para_python = directorio_propagador_octave
+
+# Esta variable se usa para guardar el reporte anterior para comparación.
+ruta_archivo_reporte_anterior_base = directorio_propagador_octave # O puedes usar directorio_tle_python si prefieres guardar los anteriores en la carpeta de Python
+
+print(f"DEBUG_CONFIG: Directorio Propagador Octave: {directorio_propagador_octave}")
+print(f"DEBUG_CONFIG: Ruta Ejecutable Octave: {ruta_ejecutable_octave}")
+print(f"DEBUG_CONFIG: Directorio TLE Python: {directorio_tle_python}")
+print(f"DEBUG_CONFIG: Directorio base para reportes de Octave (donde Python buscará): {ruta_base_reportes_octave_para_python}")
+print(f"DEBUG_CONFIG: Nombre del archivo de reporte esperado de Octave: {nombre_archivo_reporte_octave_generado}")
+print("DEBUG_CONFIG: Todas las variables globales definidas.")
+
+async def safe_send_telegram_alert(mensaje):
+    print("DEBUG: Intentando enviar alerta a Telegram.")
+    try:
+        bot = Bot(token=TELEGRAM_TOKEN)
+        if len(mensaje) > TELEGRAM_MAX_LENGTH:
+            parts = [mensaje[i:i + TELEGRAM_MAX_LENGTH] for i in range(0, len(mensaje), TELEGRAM_MAX_LENGTH)]
+            for part in parts:
+                await bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=part)
+                await asyncio.sleep(0.1)
+            print(f"Mensaje de alerta dividido y enviado a Telegram ({len(parts)} partes).")
+        else:
+            await bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=mensaje)
+            print("Mensaje de alerta enviado a Telegram exitosamente.")
+    except TelegramError as e:
+        print(f"ERROR TELEGRAM: Error al enviar el mensaje a Telegram: {e}")
+    except Exception as e:
+        print(f"ERROR GENERAL EN TELEGRAM: {e}")
+
+print("DEBUG_CONFIG: Función safe_send_telegram_alert definida.")
+
+async def procesar_satelite(satelite_id):
+    print(f"--- INICIANDO PROCESAMIENTO para el satélite con ID: {satelite_id} ---")
+
+    url_n2yo = f"https://www.n2yo.com/satellite/?s={satelite_id}"
+    nombre_archivo_tle_python_temp = f"N2YO_tle_temp_{satelite_id}.txt"
+    ruta_archivo_origen = nombre_archivo_tle_python_temp
+    ruta_archivo_destino_octave = os.path.join(directorio_propagador_octave, "tle.txt")
+    # ruta_archivo_destino_python = os.path.join(directorio_tle_python, f"tle_{satelite_id}.txt")
+
+    # --- CAMBIO CLAVE AQUÍ ---
+    # Rutas para el archivo de reporte generado por Octave y el archivo de reporte anterior.
+    # Ahora usamos el nombre exacto que Octave genera.
+    ruta_archivo_reporte = os.path.join(ruta_base_reportes_octave_para_python, nombre_archivo_reporte_octave_generado)
+    
+
+    # --- Paso 1: Obtener el TLE ---
+    print(f"DEBUG: Paso 1 - Obteniendo TLE para el satélite {satelite_id} de N2YO...")
+    try:
+        response = requests.get(url_n2yo)
+        response.raise_for_status()
+        soup = BeautifulSoup(response.content, 'html.parser')
+        pre_tags = soup.find_all('pre')
+        if len(pre_tags) >= 1:
+            tle_lines = pre_tags[0].get_text().strip().split('\n')
+            cleaned_tle = [line.strip() for line in tle_lines]
+            tle_data = '\n'.join(cleaned_tle)
+            with open(nombre_archivo_tle_python_temp, "w") as f:
+                f.write(tle_data)
+            print(f"DEBUG: TLE temporal '{nombre_archivo_tle_python_temp}' generado exitosamente.")
+        else:
+            print(f"ERROR: No se encontraron etiquetas <pre> para el satélite {satelite_id} en N2YO.")
+            return
+    except requests.exceptions.RequestException as e:
+        print(f"ERROR DE RED/N2YO: Error al acceder a la URL para el satélite {satelite_id}: {e}")
+        return
+    except Exception as e:
+        print(f"ERROR GENERAL EN OBTENCIÓN TLE: {e}")
+        return
+
+    # --- Paso 2: Copiar y renombrar el archivo TLE para Octave ---
+    print(f"DEBUG: Paso 2 - Copiando TLE para Octave...")
+    try:
+        shutil.copy2(ruta_archivo_origen, ruta_archivo_destino_octave)
+        print(f"DEBUG: Archivo TLE copiado y renombrado a 'tle.txt' para Octave.")
+    except Exception as e:
+        print(f"ERROR COPIA TLE OCTAVE: Error al copiar el archivo TLE para Octave: {e}")
+        return
+    
+    # --- Paso 3: Crear una variable del reporte de acercamiento previo ---
+    # Este paso debe ejecutarse antes de ejecutar Octave, ya que Octave puede o no
+    # crear un nuevo reporte de acercamientos
+    print(f"DEBUG: Creando una variable que permitirá saber si hay modificación en el reporte de acercamiento")
+    try:
+        with open(ruta_archivo_reporte,'r') as archivo_reporte_anterior:
+            anterior_contenido_reporte = archivo_reporte_anterior.read().strip()
+            if anterior_contenido_reporte:
+                lineas_reporte_anterior = [line.strip() for line in anterior_contenido_reporte.splitlines()]
+                id_satelite_anterior = lineas_reporte_anterior[4] # Esta variable se crea para identificar si hay modificaciones en el nuevo reporte de acercamientos
+    except Exception as e:
+        print(f"DEBUG: Archivo no encontrado {e}")
+
+    # --- Paso 4: Ejecutar Octave ---
+    print(f"DEBUG: Paso 3 - Ejecutando Octave para el satélite {satelite_id}...")
+    try:
+        result = subprocess.run(
+            [ruta_ejecutable_octave, "--no-gui", "--path", directorio_propagador_octave, script_octave_principal],
+            check=True,
+            capture_output=True,
+            text=True,
+            shell=True,
+            cwd=directorio_propagador_octave # Esto hace que Octave use su propio directorio como CWD.
+        )
+        print(f"DEBUG: Script de Octave ejecutado para el satélite {satelite_id}.")
+        if result.stdout:
+            print("DEBUG OCTAVE STDOUT:")
+            print(result.stdout)
+        if result.stderr:
+            print("DEBUG OCTAVE STDERR:")
+            print(result.stderr)
+    except FileNotFoundError:
+        print(f"ERROR OCTAVE: No se encontró Octave en '{ruta_ejecutable_octave}' o el script para el satélite {satelite_id}.")
+        return
+    except subprocess.CalledProcessError as e:
+        print(f"ERROR AL EJECUTAR OCTAVE para el satélite {satelite_id}: {e}")
+        print(f"Salida de Octave (stdout): {e.stdout}")
+        if e.stderr:
+            print(f"Error de Octave (stderr): {e.stderr}")
+        return
+    except Exception as e:
+        print(f"ERROR GENERAL AL EJECUTAR OCTAVE: {e}")
+        return
+
+    # --- Paso 5: Enviar alerta por Telegram ---
+    print(f"DEBUG: Paso 4 - Verificando reporte para el satélite {satelite_id} y enviando alerta.")
+
+    MAX_REINTENTOS = 5
+    TIEMPO_ENTRE_REINTENTOS = 1
+
+    reporte_encontrado_y_leido = False
+    for intento in range(MAX_REINTENTOS):
+        if os.path.exists(ruta_archivo_reporte): # Aquí se usa la ruta CORRECTA
+            try:
+                with open(ruta_archivo_reporte, "r") as archivo_reporte:
+                    nuevo_contenido_reporte = archivo_reporte.read().strip()
+                reporte_encontrado_y_leido = True
+                print(f"DEBUG: Reporte para {satelite_id} encontrado y leído en el intento {intento + 1}.")
+                break
+            except Exception as e:
+                print(f"ADVERTENCIA: Error al leer el reporte '{ruta_archivo_reporte}' en intento {intento + 1}: {e}")
+        else:
+            print(f"ADVERTENCIA: El archivo de reporte '{ruta_archivo_reporte}' NO encontrado en intento {intento + 1}.")
+
+        if intento < MAX_REINTENTOS - 1:
+            print(f"DEBUG: Reintentando en {TIEMPO_ENTRE_REINTENTOS} segundo(s)...")
+            await asyncio.sleep(TIEMPO_ENTRE_REINTENTOS)
+
+    if not reporte_encontrado_y_leido:
+        print(f"ERROR: No se pudo encontrar o leer el reporte '{ruta_archivo_reporte}' después de {MAX_REINTENTOS} intentos.")
+
+    try:
+        if not reporte_encontrado_y_leido:
+            nuevo_contenido_reporte = ""
+
+        hay_nuevos_acercamientos_en_reporte_actual = False
+        
+        try:
+            with open(ruta_archivo_reporte,'r') as archivo_reporte:
+                contenido_reporte = archivo_reporte.read().strip()
+                if contenido_reporte:
+                    lineas_reporte = [line.strip() for line in contenido_reporte.splitlines()]
+                    id_satelite = lineas_reporte[4]
+        except Exception as e:
+            print(f"Archivo no encontrado {e}")
+            
+        if id_satelite != id_satelite_anterior:
+            hay_nuevos_acercamientos_en_reporte_actual = True
+            print("INFO: ¡Cambio detectado en el reporte del satélite. Se enviará alerta...")
+        else:
+            print("INFO: No hubo cambios en el reporte del satélite. No se envía alerta")
+            print("INFO: No hay acercamientos en el reporte de satélite")
+        
+        if hay_nuevos_acercamientos_en_reporte_actual:
+            print(f"INFO: ¡Cambio detectado en el reporte del satélite {satelite_id}! Enviando alerta...")
+            mensaje_telegram = f"Alerta de acercamiento para el satélite {satelite_id}:\n{nuevo_contenido_reporte}"
+            await safe_send_telegram_alert(mensaje_telegram)
+        else:
+            print(f"INFO: No hubo cambios en el reporte del satélite {satelite_id}. No se envía alerta.")
+                   
+    except Exception as e:
+        print(f"ERROR GENERAL EN VERIFICACIÓN REPORTE: Error al verificar el reporte del satélite {satelite_id}: {e}")
+
+print("DEBUG_CONFIG: Función procesar_satelite definida.")
+
+async def main():
+    print("DEBUG: Iniciando la función main()...")
+    # Asegúrate de que los TLEs que estás obteniendo realmente corresponden a estos IDs de satélite
+    # y que los acercamientos se están produciendo para ellos.
+    lista_satelites = [40425, 23313, 26812, 8366, 12472, 37843, 29520, 15994, 26496, \
+                       13056, 1317, 23670, 24313, 23656, 2969, 33280, 23168, 8751, \
+                       27855, 14050, 5854, 9921, 20499] # Reemplaza con la lista de IDs de tus satélites
+    for satelite_id in lista_satelites:
+        await procesar_satelite(satelite_id)
+    print("DEBUG: Loop de satélites completado en main().")
+
+print("DEBUG_CONFIG: Función main definida.")
+
+if __name__ == "__main__":
+    try:
+        print("DEBUG: Ejecutando asyncio.run(main())...")
+        asyncio.run(main())
+        print("Proceso de automatización para todos los satélites completado.")
+    except Exception as e:
+        print(f"ERROR CRÍTICO: El script falló completamente. Error: {e}")
+
+
+
+
+
+
+
+
+
+
