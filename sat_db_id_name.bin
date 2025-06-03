@@ -1,0 +1,582 @@
+# Created by Octave 4.2.2, Tue May 20 11:46:01 2025 GMT <unknown@unknown>
+# name: sat_db
+# type: cell
+# rows: 1
+# columns: 25
+# name: <cell-element>
+# type: cell
+# rows: 1
+# columns: 2
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 6
+39035U
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 8
+MEXSAT 3
+
+
+
+
+
+
+# name: <cell-element>
+# type: cell
+# rows: 1
+# columns: 2
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 6
+40946U
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 9
+MORELOS 3
+
+
+
+
+
+
+# name: <cell-element>
+# type: cell
+# rows: 1
+# columns: 2
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 6
+40425U
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 15
+EUTELSAT WEST B
+
+
+
+
+
+
+# name: <cell-element>
+# type: cell
+# rows: 1
+# columns: 2
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 6
+23313U
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 2
+J2
+
+
+
+
+
+
+# name: <cell-element>
+# type: cell
+# rows: 1
+# columns: 2
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 6
+26812U
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 15
+ARIANE 44LP DEB
+
+
+
+
+
+
+# name: <cell-element>
+# type: cell
+# rows: 1
+# columns: 2
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 6
+08366U
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 6
+GOES-1
+
+
+
+
+
+
+# name: <cell-element>
+# type: cell
+# rows: 1
+# columns: 2
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 6
+12472U
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 6
+GOES-5
+
+
+
+
+
+
+# name: <cell-element>
+# type: cell
+# rows: 1
+# columns: 2
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 6
+37843U
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 8
+VIASAT-1
+
+
+
+
+
+
+# name: <cell-element>
+# type: cell
+# rows: 1
+# columns: 2
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 6
+29520U
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 4
+XM-4
+
+
+
+
+
+
+# name: <cell-element>
+# type: cell
+# rows: 1
+# columns: 2
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 6
+15994U
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 4
+ASC1
+
+
+
+
+
+
+# name: <cell-element>
+# type: cell
+# rows: 1
+# columns: 2
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 6
+26496U
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 8
+ARIANE 5
+
+
+
+
+
+
+# name: <cell-element>
+# type: cell
+# rows: 1
+# columns: 2
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 6
+13056U
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 5
+EKRAN
+
+
+
+
+
+
+# name: <cell-element>
+# type: cell
+# rows: 1
+# columns: 2
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 6
+01317U
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 12
+INTELSAT 1F1
+
+
+
+
+
+
+# name: <cell-element>
+# type: cell
+# rows: 1
+# columns: 2
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 6
+23670U
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 12
+TELSTAR 402R
+
+
+
+
+
+
+# name: <cell-element>
+# type: cell
+# rows: 1
+# columns: 2
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 6
+24313U
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 10
+ECHOSTAR 2
+
+
+
+
+
+
+# name: <cell-element>
+# type: cell
+# rows: 1
+# columns: 2
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 6
+23656U
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 8
+SL-12 RB
+
+
+
+
+
+
+# name: <cell-element>
+# type: cell
+# rows: 1
+# columns: 2
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 6
+02969U
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 13
+INTELSAT 2 F4
+
+
+
+
+
+
+# name: <cell-element>
+# type: cell
+# rows: 1
+# columns: 2
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 6
+33280U
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 9
+BREEZE RB
+
+
+
+
+
+
+# name: <cell-element>
+# type: cell
+# rows: 1
+# columns: 2
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 6
+23168U
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 11
+COSMOS 2282
+
+
+
+
+
+
+# name: <cell-element>
+# type: cell
+# rows: 1
+# columns: 2
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 6
+08751U
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 8
+TITAN 3C
+
+
+
+
+
+
+# name: <cell-element>
+# type: cell
+# rows: 1
+# columns: 2
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 6
+27855U
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 8
+BLOCK DM
+
+
+
+
+
+
+# name: <cell-element>
+# type: cell
+# rows: 1
+# columns: 2
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 6
+14050U
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 6
+GOES-6
+
+
+
+
+
+
+# name: <cell-element>
+# type: cell
+# rows: 1
+# columns: 2
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 6
+05854U
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 8
+TITAN 3C
+
+
+
+
+
+
+# name: <cell-element>
+# type: cell
+# rows: 1
+# columns: 2
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 6
+09921U
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 11
+SL-6 R/B(2)
+
+
+
+
+
+
+# name: <cell-element>
+# type: cell
+# rows: 1
+# columns: 2
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 6
+20499U
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 9
+RADUGA 25
+
+
+
+
+
+
+
+
